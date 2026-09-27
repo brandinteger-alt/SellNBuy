@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Brand Integer — Buy & Sell</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap');
+:root{
+  --bg:#f7f3ea;--card:#fffdf9;--line:#ddd5c5;--gold:#aa9563;
+  --text:#292722;--muted:#827b6d;--green:#6d876c;--red:#a86d67;--shadow:0 8px 30px rgba(60,48,25,.07)
+}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif}
+header.top{background:#fffdf9;border-bottom:1px solid var(--line);padding:22px 5%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20}
+.logo{font-family:"Playfair Display",serif;font-size:31px;margin:0}.tag{font-family:"Playfair Display",serif;font-style:italic;color:var(--gold);font-size:16px;margin-top:3px}
+.nav-links{display:flex;gap:15px}.nav-links a{color:var(--text);text-decoration:none;font-weight:500;border:1px solid var(--line);border-radius:12px;padding:10px 18px;transition:.18s;font-size:14px}
+.nav-links a:hover{border-color:var(--gold);background:#f9f5ee}
+main{max-width:1280px;margin:auto;padding:40px 5% 70px}
+.eyebrow{letter-spacing:3px;color:#aaa18f;font-size:12px;font-weight:700;margin:0}
+.title{font-family:"Playfair Display",serif;font-size:54px;margin:8px 0 0}
+.sub{color:var(--muted);margin:15px 0 35px;font-size:16px}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:24px;margin-top:30px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:var(--shadow);transition:.2s ease;cursor:pointer}
+.card:hover{transform:translateY(-6px);border-color:var(--gold);box-shadow:0 12px 40px rgba(60,48,25,.12)}
+.pic{width:100%;height:240px;background:#eee8dc;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.pic img{width:100%;height:100%;object-fit:cover}
+.card-body{padding:22px}
+.badge{display:inline-block;background:#f4efe5;color:#8d8576;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:12px}
+.card h3{margin:10px 0 6px;font-family:"Playfair Display",serif;font-size:24px;line-height:1.2}
+.card .price{font-family:"Playfair Display",serif;font-size:32px;color:var(--gold);margin:12px 0 8px;font-weight:600}
+.card .price-min{color:var(--muted);font-size:12px;margin:2px 0 12px}
+.meta{color:var(--muted);font-size:13px;display:flex;align-items:center;gap:8px;margin:12px 0 10px}
+.meta strong{color:var(--text)}
+.courier{color:#a88d6a;font-size:12px;line-height:1.5;margin:10px 0 15px;padding:8px 0;border-top:1px solid #eee8dc;border-bottom:1px solid #eee8dc}
+.btn{border:1px solid var(--gold);background:#fffdf9;color:#7e6b43;border-radius:12px;padding:11px 18px;font-weight:600;cursor:pointer;transition:.18s;font-size:14px}
+.btn:hover{background:var(--gold);color:#fff;border-color:var(--gold)}
+.btn.primary{background:#9f8957;color:#fff;border-color:#9f8957}
+.btn.primary:hover{background:#8a7a4a}
+.loading{text-align:center;padding:60px 20px;color:#999;font-size:16px}
+.empty{text-align:center;padding:80px 20px;color:#aaa}
+.empty h3{font-family:"Playfair Display",serif;font-size:32px;margin:20px 0}
+.modal{position:fixed;inset:0;background:rgba(35,30,20,.5);display:none;align-items:center;justify-content:center;padding:20px;z-index:30;animation:fadeIn .2s}
+.modal.open{display:flex}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modalbox{max-width:700px;width:100%;background:#fffdf9;border-radius:24px;padding:32px;max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modalhead h2{font-family:"Playfair Display",serif;font-size:32px;margin:0}
+.close{border:0;background:transparent;font-size:32px;cursor:pointer;color:#999;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center}
+.close:hover{color:#333}
+.form-group{margin:20px 0}
+.form-group label{display:block;margin-bottom:8px;font-weight:600;color:var(--text)}
+.form-group input,.form-group textarea{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-family:inherit;font-size:14px;color:var(--text)}
+.form-group input:focus,.form-group textarea:focus{outline:none;border-color:var(--gold);background:#fffbf5}
+.form-group textarea{resize:vertical;min-height:80px}
+.modal-actions{display:flex;gap:12px;margin-top:28px}
+.modal-actions button{flex:1;padding:14px;border-radius:12px;font-weight:600;border:1px solid var(--gold)}
+.modal-actions .btn.primary{flex:1.2}
+.kv{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f0ebe3;font-size:14px}
+.kv:last-child{border:0}
+.kv span:first-child{color:var(--muted);font-weight:500}
+.kv strong{text-align:right;flex:1;padding-left:15px;color:var(--text)}
+@media(max-width:768px){
+  main{padding:25px 5% 60px}
+  .title{font-size:38px}
+  .products-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+  .card-body{padding:16px}
+  .card h3{font-size:18px}
+  .card .price{font-size:24px}
+  header.top{padding:16px 5%;flex-direction:column;gap:12px;align-items:flex-start}
+  .nav-links{width:100%;justify-content:flex-start}
+  .nav-links a{font-size:13px;padding:8px 14px}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div><h1 class="logo">Brand Integer</h1><div class="tag">Community Driven Growth Partner</div></div>
+  <nav class="nav-links"><a href="#sell">📤 Sell Product</a><a href="#activity">📋 My Activity</a></nav>
+</header>
+
+<main>
+  <div class="eyebrow">MARKETPLACE</div>
+  <h2 class="title">Live Products</h2>
+  <p class="sub">Browse and buy products from our community marketplace. Click any product to express interest.</p>
+  
+  <div id="productsGrid" class="products-grid"></div>
+  <div id="loadingMsg" class="loading">⏳ Loading products...</div>
+  <div id="emptyMsg" class="empty" style="display:none">
+    <h3>No Products Yet</h3>
+    <p>Check back soon for new listings from our community!</p>
+  </div>
+</main>
+
+<!-- Interest Modal -->
+<div id="interestModal" class="modal">
+  <div class="modalbox">
+    <div class="modalhead">
+      <h2>Express Interest</h2>
+      <button class="close" onclick="closeModal()">&times;</button>
+    </div>
+    
+    <div id="productDetail"></div>
+    
+    <form onsubmit="submitInterest(event)">
+      <div class="form-group">
+        <label>Your Name *</label>
+        <input required id="buyerName" type="text" placeholder="Your full name">
+      </div>
+      
+      <div class="form-group">
+        <label>WhatsApp Number *</label>
+        <input required id="buyerPhone" type="tel" placeholder="+91 9876543210">
+      </div>
+      
+      <div class="form-group">
+        <label>Email</label>
+        <input id="buyerEmail" type="email" placeholder="your@email.com">
+      </div>
+      
+      <div class="form-group">
+        <label>Delivery Address *</label>
+        <textarea required id="buyerAddress" placeholder="Street address, apartment/house number, etc."></textarea>
+      </div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group" style="margin:0">
+          <label>City *</label>
+          <input required id="buyerCity" type="text" placeholder="City">
+        </div>
+        <div class="form-group" style="margin:0">
+          <label>Pincode *</label>
+          <input required id="buyerPincode" type="text" placeholder="PIN code">
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn" type="button" onclick="closeModal()">Cancel</button>
+        <button class="btn primary" type="submit">✓ Send Enquiry</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbxv9VFTrsSlia0oZ_gxpmBfTyL4z1IzZ6Za1JSQfHhTk3LnqOCNOpwP_Ki6FryditqG/exec';
+let allProducts = [];
+let currentProduct = null;
+
+async function loadProducts() {
+  try {
+    const response = await fetch(API_URL + '?action=getProducts');
+    const data = await response.json();
+    
+    if (!data.ok || !data.products) {
+      throw new Error('Could not fetch products');
+    }
+
+    allProducts = data.products || [];
+    renderProducts();
+    
+  } catch (err) {
+    console.error('Error:', err);
+    document.getElementById('loadingMsg').innerHTML = '❌ Error loading products. Please refresh.';
+  }
+}
+
+function renderProducts() {
+  const grid = document.getElementById('productsGrid');
+  const loading = document.getElementById('loadingMsg');
+  const empty = document.getElementById('emptyMsg');
+  
+  if (allProducts.length === 0) {
+    grid.style.display = 'none';
+    loading.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  grid.innerHTML = allProducts.map((p, i) => {
+    const img = (p.images && p.images.length > 0) ? p.images[0] : 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22310%22 height=%22240%22%3E%3Crect fill=%22%23eee8dc%22 width=%22310%22 height=%22240%22/%3E%3C/svg%3E';
+    return `
+      <div class="card" onclick="openModal(${i})">
+        <div class="pic"><img src="${img}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22310%22 height=%22240%22%3E%3Crect fill=%22%23eee8dc%22 width=%22310%22 height=%22240%22/%3E%3C/svg%3E'" alt="${p.name}"></div>
+        <div class="card-body">
+          <span class="badge">${p.category} · ${p.condition}</span>
+          <h3>${p.name}</h3>
+          <div class="price">₹${Number(p.price).toLocaleString('en-IN')}</div>
+          <div class="price-min">Min: ₹${Number(p.minPrice).toLocaleString('en-IN')}</div>
+          <div class="meta"><strong>📍 ${p.location}</strong></div>
+          <div class="meta">${p.qty} item${p.qty !== 1 ? 's' : ''} available</div>
+          <div class="courier">Courier charges extra · actual Delhivery charges or lower as per buyer discretion</div>
+          <button class="btn primary" style="width:100%;padding:12px" onclick="event.stopPropagation()">Buy / Interested →</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  grid.style.display = 'grid';
+  loading.style.display = 'none';
+  empty.style.display = 'none';
+}
+
+function openModal(index) {
+  if (index < 0 || index >= allProducts.length) return;
+  
+  currentProduct = allProducts[index];
+  
+  const detail = document.getElementById('productDetail');
+  detail.innerHTML = `
+    <div style="background:#f9f5ee;border-radius:16px;padding:18px;margin-bottom:20px">
+      <div class="kv"><span>Product</span><strong>${currentProduct.name}</strong></div>
+      <div class="kv"><span>Category</span><strong>${currentProduct.category}</strong></div>
+      <div class="kv"><span>Condition</span><strong>${currentProduct.condition}</strong></div>
+      <div class="kv"><span>Price</span><strong>₹${Number(currentProduct.price).toLocaleString('en-IN')}</strong></div>
+      <div class="kv"><span>Min Price</span><strong>₹${Number(currentProduct.minPrice).toLocaleString('en-IN')}</strong></div>
+      <div class="kv"><span>Location</span><strong>${currentProduct.location}</strong></div>
+      <div class="kv"><span>Seller</span><strong>${currentProduct.sellerName}</strong></div>
+      <div class="kv"><span style="vertical-align:top">Description</span><strong style="text-align:left">${currentProduct.description || 'No description'}</strong></div>
+    </div>
+  `;
+  
+  document.getElementById('interestModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('interestModal').classList.remove('open');
+  currentProduct = null;
+  document.querySelector('form').reset();
+}
+
+async function submitInterest(e) {
+  e.preventDefault();
+  
+  if (!currentProduct) return;
+  
+  try {
+    const payload = {
+      action: 'submitInterest',
+      productId: currentProduct.id,
+      productName: currentProduct.name,
+      price: currentProduct.price,
+      buyerName: document.getElementById('buyerName').value,
+      buyerWhatsApp: document.getElementById('buyerPhone').value,
+      buyerEmail: document.getElementById('buyerEmail').value,
+      address: document.getElementById('buyerAddress').value,
+      city: document.getElementById('buyerCity').value,
+      pincode: document.getElementById('buyerPincode').value,
+      sellerName: currentProduct.sellerName,
+      sellerWhatsApp: currentProduct.sellerWhatsApp
+    };
+    
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    
+    const result = await response.json();
+    
+    if (result.ok) {
+      alert('✓ Interest recorded!\n\nSeller will contact you on WhatsApp shortly.');
+      closeModal();
+    } else {
+      alert('❌ Error: ' + (result.error || 'Could not submit'));
+    }
+  } catch (err) {
+    alert('❌ Error: ' + err.message);
+  }
+}
+
+window.addEventListener('load', loadProducts);
+setInterval(loadProducts, 15000);
+</script>
+
+</body>
+</html>
