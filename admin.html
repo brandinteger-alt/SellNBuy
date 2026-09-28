@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Brand Integer | Admin</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap');
+:root{--cream:#f8f5ef;--paper:#fff;--gold:#b39a68;--gold-dark:#9e8450;--gold-soft:#d9cfb8;--ink:#26231f;--body:#8f877b;--line:#e2dacb;--shadow:0 8px 24px rgba(126,105,67,.07)}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:'DM Sans',Arial,sans-serif;font-weight:500}button,input{font:inherit}
+.login-container{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--cream)}.login-box{background:#fff;padding:40px;border-radius:18px;border:1px solid var(--line);width:min(420px,100%);box-shadow:var(--shadow)}.login-box h2{font-family:'Playfair Display',serif;color:var(--gold);margin-bottom:20px;font-size:28px}.login-box input{width:100%;padding:12px;border:1px solid var(--line);border-radius:7px;margin-bottom:15px;font-size:11px;outline:0}.login-box button{width:100%;padding:12px;background:linear-gradient(180deg,#b39a68,#9e8450);color:#fff;border:0;border-radius:7px;font-weight:700;cursor:pointer}.login-error{display:none;color:#a45e55;background:#fbefed;border:1px solid #e3c1bb;border-radius:7px;padding:9px;font-size:9px;margin-top:10px}
+.admin-shell{background:var(--cream);min-height:100vh;display:none}
+header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line)}
+.nav{max-width:1240px;margin:auto;padding:18px 28px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;flex-direction:column;min-width:220px;font-family:'Playfair Display',serif;font-size:34px;line-height:.8;letter-spacing:-.7px;color:#222}.logo small{font-size:25px;line-height:1.05;color:var(--gold);font-style:italic;margin-top:9px}
+.btn{border:1px solid var(--gold);background:linear-gradient(180deg,#fffdf9,#fbf8f1);color:var(--gold-dark);border-radius:7px;padding:11px 18px;font-weight:700;font-size:11px;cursor:pointer;box-shadow:0 4px 12px rgba(126,105,67,.10);transition:.2s ease}
+.btn:hover{transform:translateY(-1px);box-shadow:0 7px 18px rgba(126,105,67,.17)}
+.stats{max-width:1240px;margin:auto;padding:20px 28px;display:grid;grid-template-columns:repeat(6,1fr);gap:15px}
+.stat{cursor:pointer;transition:.2s}.stat:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(126,105,67,.16)}.stat.active{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold-soft)}.stat.earn{background:linear-gradient(180deg,#fffaf0,#f7efdc);border-color:#dfcfaa}
+.earn-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:16px 0 24px}.earn-box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow)}.earn-box .stat-num{font-size:24px}.earn-note{font-size:10px;color:#8f877b;line-height:1.5;margin-top:6px}
+@media(max-width:850px){.earn-grid{grid-template-columns:repeat(2,1fr)}}
+.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;text-align:center;box-shadow:var(--shadow)}
+.stat-num{font-family:'Playfair Display',serif;font-size:28px;color:var(--gold);font-weight:600}
+.stat-label{font-size:9px;color:#8f877b;text-transform:uppercase;letter-spacing:1px;margin-top:7px}
+.tabs{max-width:1240px;margin:auto;padding:20px 28px;border-bottom:1px solid var(--line);display:flex;gap:25px;flex-wrap:wrap}
+.tab-btn{border:0;background:0;font-size:12px;color:#8f877b;font-weight:700;cursor:pointer;padding-bottom:10px;border-bottom:2px solid transparent;transition:.2s}
+.tab-btn.active{color:var(--gold);border-color:var(--gold)}
+.content{max-width:1240px;margin:auto;padding:28px}
+.table{width:100%;border-collapse:collapse;background:#fff}
+.table th{background:#f9f7f2;color:#8f877b;font-weight:700;text-align:left;padding:12px;font-size:9px;letter-spacing:1px;border-bottom:1px solid var(--line)}
+.table td{padding:12px;border-bottom:1px solid var(--line);font-size:9px;color:#756d62}
+.table tr:hover{background:#faf8f4}
+.tag{display:inline-block;background:#f0e8d8;color:#8d7549;padding:4px 8px;border-radius:6px;font-weight:600;font-size:8px}
+.admin-btn{border:1px solid var(--gold-soft);background:#fff;color:#7e6b43;border-radius:7px;padding:7px 9px;font-size:9px;font-weight:700;cursor:pointer}.admin-btn.primary{background:#9f8957;color:#fff;border-color:#9f8957}.admin-btn:disabled{opacity:.45;cursor:not-allowed}
+.tab-content{display:none}.tab-content.active{display:block}
+@media(max-width:850px){.stats{grid-template-columns:repeat(3,1fr)}.table{font-size:8px}}
+@media(max-width:560px){.stats{grid-template-columns:repeat(2,1fr)}.tabs{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<div id="loginContainer" class="login-container">
+<div class="login-box">
+<div class="logo" style="margin-bottom:20px">Brand Integer<small>Admin</small></div>
+<h2>Admin Login</h2>
+<input id="passwordInput" type="password" placeholder="Enter password" onkeypress="if(event.key==='Enter') login()">
+<button onclick="login()">Login</button>
+<div id="loginError" class="login-error"></div>
+</div>
+</div>
+
+<div id="adminShell" class="admin-shell">
+<header>
+<nav class="nav">
+<div class="logo">Brand Integer<small>Admin Dashboard</small></div>
+<button class="btn" onclick="logout()">🚪 Logout</button>
+</nav>
+</header>
+
+<div class="stats">
+<div class="stat" data-tab="pending" onclick="switchTab('pending')"><div class="stat-num" id="statPending">0</div><div class="stat-label">Pending Listings</div></div>
+<div class="stat" data-tab="live" onclick="switchTab('live')"><div class="stat-num" id="statLive">0</div><div class="stat-label">Live</div></div>
+<div class="stat" data-tab="enquiries" onclick="switchTab('enquiries')"><div class="stat-num" id="statEnquiries">0</div><div class="stat-label">Enquiries</div></div>
+<div class="stat" data-tab="awaiting" onclick="switchTab('awaiting')"><div class="stat-num" id="statAwaiting">0</div><div class="stat-label">Awaiting</div></div>
+<div class="stat" data-tab="payments" onclick="switchTab('payments')"><div class="stat-num" id="statPayments">0</div><div class="stat-label">To Release</div></div>
+<div class="stat earn" data-tab="earnings" onclick="switchTab('earnings')"><div class="stat-num" id="statEarnings">₹0</div><div class="stat-label">BI Earnings</div></div>
+</div>
+
+
+<div class="content">
+<button id="backBtn" class="btn" style="display:none;margin-bottom:16px" onclick="switchTab('dashboard')">← Dashboard</button>
+<div id="dashboardTab" class="tab-content active">
+<h2>Recent Activity</h2>
+<table class="table"><thead><tr><th>Type</th><th>Details</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead><tbody id="dashboardTable"><tr><td colspan="5" style="text-align:center;color:#8f877b">Loading...</td></tr></tbody></table>
+</div>
+
+<div id="pendingTab" class="tab-content">
+<h2>Pending Listings</h2>
+<table class="table"><thead><tr><th>Product</th><th>Seller</th><th>Price</th><th>Qty</th><th>Action</th></tr></thead><tbody id="pendingTable"><tr><td colspan="5" style="text-align:center;color:#8f877b">Loading...</td></tr></tbody></table>
+</div>
+
+<div id="liveTab" class="tab-content">
+<h2>Live Products</h2>
+<table class="table"><thead><tr><th>Product</th><th>Seller</th><th>Price</th><th>Qty</th></tr></thead><tbody id="liveTable"><tr><td colspan="4" style="text-align:center;color:#8f877b">Loading...</td></tr></tbody></table>
+</div>
+
+<div id="enquiriesTab" class="tab-content">
+<h2>Buyer Enquiries</h2>
+<table class="table"><thead><tr><th>Product</th><th>Buyer</th><th>City</th><th>Status</th><th>Action</th></tr></thead><tbody id="enquiriesTable"><tr><td colspan="5" style="text-align:center;color:#8f877b">Loading...</td></tr></tbody></table>
+</div>
+
+<div id="awaitingTab" class="tab-content">
+<h2>Awaiting Approval</h2>
+<table class="table"><thead><tr><th>Product</th><th>Buyer</th><th>Price</th><th>Action</th></tr></thead><tbody id="awaitingTable"><tr><td colspan="4" style="text-align:center;color:#8f877b">Loading...</td></tr></tbody></table>
+</div>
+
+<div id="paymentsTab" class="tab-content">
+<h2>Payment Release</h2>
+<table class="table"><thead><tr><th>Product</th><th>Seller</th><th>Amount</th><th>Action</th></tr></thead><tbody id="paymentsTable"><tr><td colspan="4" style="text-align:center;color:#8f877b">Loading...</td></tr></tbody></table>
+</div>
+
+<div id="earningsTab" class="tab-content">
+<h2>Brand Integer Earnings</h2>
+<div class="earn-note">Per completed transaction: 4% seller commission + 4% buyer commission + ₹5 buyer platform fee. <b>Earned</b> = payment released to seller. <b>Upcoming</b> = confirmed orders not yet released.</div>
+<div class="earn-grid">
+<div class="earn-box"><div class="stat-label">Seller Commission (4%)</div><div class="stat-num" id="earnSeller">₹0</div></div>
+<div class="earn-box"><div class="stat-label">Buyer Commission (4%)</div><div class="stat-num" id="earnBuyer">₹0</div></div>
+<div class="earn-box"><div class="stat-label">Platform Fee (₹5)</div><div class="stat-num" id="earnFee">₹0</div></div>
+<div class="earn-box" style="border-color:var(--gold)"><div class="stat-label">Total Earned</div><div class="stat-num" id="earnTotal">₹0</div><div class="earn-note">Upcoming: <b id="earnUpcoming">₹0</b></div></div>
+</div>
+<table class="table"><thead><tr><th>Product</th><th>Seller</th><th>Sale Price</th><th>BI Earning</th><th>Status</th></tr></thead><tbody id="earningsTable"><tr><td colspan="5" style="text-align:center;color:#8f877b">Loading...</td></tr></tbody></table>
+</div>
+</div>
+</div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbz72EdExA6rzpSDhI-HG3hFv2rylJaeJb0VpOpweSL_HHMkoiHVs-wuMAI6i-la_46E/exec';
+let adminPassword = '';
+let isLoggedIn = false;
+let refreshTimer = null;
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+async function apiCall(action, payload = {}) {
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify({action, password: adminPassword, ...payload})
+    });
+    const text = await response.text();
+    return JSON.parse(text);
+  } catch (err) {
+    console.error('API Error:', err);
+    return {ok: false, error: err.message};
+  }
+}
+
+async function login(savedPwd) {
+  adminPassword = savedPwd || document.getElementById('passwordInput').value;
+  const data = await apiCall('adminData');
+  if (!data.ok) {
+    adminPassword = '';
+    localStorage.removeItem('bi_admin_pwd');
+    if (savedPwd) return; // saved password no longer valid: show login screen
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('loginError').textContent = '❌ ' + (data.error || 'Incorrect password');
+    return;
+  }
+  isLoggedIn = true;
+  try { localStorage.setItem('bi_admin_pwd', adminPassword); } catch (e) {}
+  document.getElementById('loginContainer').style.display = 'none';
+  document.getElementById('adminShell').style.display = 'block';
+  refresh();
+  let lastTab = null; try { lastTab = localStorage.getItem('bi_admin_tab'); } catch (e) {}
+  if (lastTab && document.getElementById(lastTab + 'Tab')) switchTab(lastTab, document.querySelector(`.tab-btn[onclick*="'${lastTab}'"]`));
+  clearInterval(refreshTimer);
+  refreshTimer = setInterval(refresh, 10000);
+}
+
+function logout() {
+  isLoggedIn = false;
+  adminPassword = '';
+  try { localStorage.removeItem('bi_admin_pwd'); } catch (e) {}
+  clearInterval(refreshTimer);
+  document.getElementById('loginContainer').style.display = 'flex';
+  document.getElementById('adminShell').style.display = 'none';
+  document.getElementById('passwordInput').value = '';
+  document.getElementById('loginError').style.display = 'none';
+}
+
+async function refresh() {
+  if (!isLoggedIn) return;
+  
+  const data = await apiCall('adminData');
+  if (!data.ok) {
+    console.warn('Refresh error:', data.error);
+    return;
+  }
+  
+  const listings = data.listings || [];
+  const transactions = data.transactions || [];
+  
+  const pending = listings.filter(l => l.status === 'Pending Approval');
+  const live = listings.filter(l => l.status === 'Live');
+  const enquiries = transactions.filter(t => t.status === 'Pending');
+  const awaiting = transactions.filter(t => t.status === 'Awaiting Buyer Approval');
+  const delivered = transactions.filter(t => t.status === 'Delivered');
+  const toRelease = delivered.filter(t => t.paymentReleased !== 'Yes');
+  
+  document.getElementById('statPending').textContent = pending.length;
+  document.getElementById('statLive').textContent = live.length;
+  document.getElementById('statEnquiries').textContent = enquiries.length;
+  document.getElementById('statAwaiting').textContent = awaiting.length;
+  document.getElementById('statPayments').textContent = toRelease.length;
+  renderEarnings(transactions);
+  
+  renderTables(listings, transactions);
+}
+
+function renderTables(listings, transactions) {
+  const pending = listings.filter(l => l.status === 'Pending Approval');
+  const live = listings.filter(l => l.status === 'Live');
+  const enquiries = transactions.filter(t => t.status === 'Pending');
+  const awaiting = transactions.filter(t => t.status === 'Awaiting Buyer Approval');
+  const delivered = transactions.filter(t => t.status === 'Delivered');
+  
+  // Dashboard
+  document.getElementById('dashboardTable').innerHTML = pending.slice(0, 10).map(l => `
+    <tr>
+      <td>Listing</td>
+      <td><strong>${esc(l.name)}</strong> from ${esc(l.sellerName)}</td>
+      <td>₹${Number(l.price).toLocaleString('en-IN')}</td>
+      <td><span class="tag">Pending</span></td>
+      <td><button class="admin-btn primary" onclick="approveL('${l.id}')">✓ Approve</button></td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" style="text-align:center">No pending items</td></tr>';
+  
+  // Pending
+  document.getElementById('pendingTable').innerHTML = pending.map(l => `
+    <tr>
+      <td><strong>${esc(l.name)}</strong></td>
+      <td>${esc(l.sellerName)}</td>
+      <td>₹${Number(l.price).toLocaleString('en-IN')}</td>
+      <td>${l.qty}</td>
+      <td><button class="admin-btn primary" onclick="approveL('${l.id}')">✓</button> <button class="admin-btn" onclick="rejectL('${l.id}')">✗</button></td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" style="text-align:center">No pending</td></tr>';
+  
+  // Live
+  document.getElementById('liveTable').innerHTML = live.map(l => `
+    <tr>
+      <td><strong>${esc(l.name)}</strong></td>
+      <td>${esc(l.sellerName)}</td>
+      <td>₹${Number(l.price).toLocaleString('en-IN')}</td>
+      <td>${l.qty}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="4" style="text-align:center">No live products</td></tr>';
+  
+  // Enquiries
+  document.getElementById('enquiriesTable').innerHTML = enquiries.map(t => `
+    <tr>
+      <td><strong>${esc(t.productName)}</strong></td>
+      <td>${esc(t.buyerName)}</td>
+      <td>${esc(t.city)}</td>
+      <td><span class="tag">New</span></td>
+      <td><button class="admin-btn primary" onclick="confirmPayment('${t.id}')">Confirm</button></td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" style="text-align:center">No enquiries</td></tr>';
+  
+  // Awaiting
+  document.getElementById('awaitingTable').innerHTML = awaiting.map(t => `
+    <tr>
+      <td><strong>${esc(t.productName)}</strong></td>
+      <td>${esc(t.buyerName)}</td>
+      <td>₹${Number(t.price).toLocaleString('en-IN')}</td>
+      <td><button class="admin-btn primary" onclick="markDelivered('${t.id}')">Mark Delivered</button></td>
+    </tr>
+  `).join('') || '<tr><td colspan="4" style="text-align:center">No awaiting</td></tr>';
+  
+  // Payments
+  document.getElementById('paymentsTable').innerHTML = delivered.map(t => `
+    <tr>
+      <td><strong>${esc(t.productName)}</strong></td>
+      <td>${esc(t.sellerName)}</td>
+      <td>₹${Number(t.price).toLocaleString('en-IN')}</td>
+      <td>${t.paymentReleased === 'Yes' ? '<span class="tag">Released</span>' : '<button class="admin-btn primary" onclick="releasePayment(\''+t.id+'\')">Release</button>'}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="4" style="text-align:center">No payments pending</td></tr>';
+}
+
+async function approveL(id) {
+  if (!confirm('Approve this listing?')) return;
+  const data = await apiCall('adminAction', {actionType: 'approveListing', id});
+  if (data.ok) {
+    refresh();
+  } else {
+    alert('❌ Error: ' + data.error);
+  }
+}
+
+async function rejectL(id) {
+  if (!confirm('Reject this listing?')) return;
+  const data = await apiCall('adminAction', {actionType: 'rejectListing', id});
+  if (data.ok) {
+    refresh();
+  } else {
+    alert('❌ Error: ' + data.error);
+  }
+}
+
+async function confirmPayment(id) {
+  const data = await apiCall('adminAction', {actionType: 'approveBuyer', id});
+  if (data.ok) {
+    alert('✅ Payment confirmed');
+    refresh();
+  } else {
+    alert('❌ Error: ' + data.error);
+  }
+}
+
+async function markDelivered(id) {
+  if (!confirm('Buyer has received and approved the product?')) return;
+  const data = await apiCall('adminAction', {actionType: 'markDelivered', id});
+  if (data.ok) refresh(); else alert('❌ Error: ' + data.error);
+}
+
+async function releasePayment(id) {
+  if (!confirm('Release payment to seller?')) return;
+  const data = await apiCall('adminAction', {actionType: 'releasePayment', id});
+  if (data.ok) {
+    alert('✅ Payment released');
+    refresh();
+  } else {
+    alert('❌ Error: ' + data.error);
+  }
+}
+
+const rupee = n => '₹' + Math.round(n).toLocaleString('en-IN');
+function biEarning(price) { const p = Number(price) || 0; return {seller: p * 0.04, buyer: p * 0.04, fee: 5, total: p * 0.08 + 5}; }
+
+function renderEarnings(transactions) {
+  const earned = transactions.filter(t => t.paymentReleased === 'Yes');
+  const upcoming = transactions.filter(t => t.paymentConfirmed === 'Yes' && t.paymentReleased !== 'Yes');
+  const sum = (list, k) => list.reduce((a, t) => a + biEarning(t.price)[k], 0);
+  document.getElementById('earnSeller').textContent = rupee(sum(earned, 'seller'));
+  document.getElementById('earnBuyer').textContent = rupee(sum(earned, 'buyer'));
+  document.getElementById('earnFee').textContent = rupee(sum(earned, 'fee'));
+  document.getElementById('earnTotal').textContent = rupee(sum(earned, 'total'));
+  document.getElementById('earnUpcoming').textContent = rupee(sum(upcoming, 'total'));
+  document.getElementById('statEarnings').textContent = rupee(sum(earned, 'total'));
+  const rows = [...earned, ...upcoming];
+  document.getElementById('earningsTable').innerHTML = rows.map(t => `
+    <tr>
+      <td><strong>${esc(t.productName)}</strong></td>
+      <td>${esc(t.sellerName)}</td>
+      <td>${rupee(t.price)}</td>
+      <td><strong>${rupee(biEarning(t.price).total)}</strong></td>
+      <td><span class="tag">${t.paymentReleased === 'Yes' ? 'Earned' : 'Upcoming'}</span></td>
+    </tr>`).join('') || '<tr><td colspan="5" style="text-align:center">No earnings yet</td></tr>';
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(name + 'Tab').classList.add('active');
+  const tb = btn && btn.classList.contains('tab-btn') ? btn : document.querySelector(`.tab-btn[onclick*="'${name}'"]`);
+  if (tb) tb.classList.add('active');
+  document.querySelectorAll('.stat').forEach(el => el.classList.toggle('active', el.dataset.tab === name));
+  document.getElementById('backBtn').style.display = name === 'dashboard' ? 'none' : 'inline-block';
+  try { localStorage.setItem('bi_admin_tab', name); } catch (e) {}
+  if (!btn || !btn.classList.contains('tab-btn')) document.querySelector('.content').scrollIntoView({behavior: 'smooth'});
+}
+
+// Auto-login after refresh
+(function () {
+  let saved = null;
+  try { saved = localStorage.getItem('bi_admin_pwd'); } catch (e) {}
+  if (saved) {
+    document.getElementById('loginContainer').style.display = 'none';
+    document.getElementById('adminShell').style.display = 'block';
+    login(saved).then(() => { if (!isLoggedIn) { document.getElementById('adminShell').style.display = 'none'; document.getElementById('loginContainer').style.display = 'flex'; } });
+  } else {
+    document.getElementById('passwordInput').focus();
+  }
+})();
+</script>
+</body>
+</html>
