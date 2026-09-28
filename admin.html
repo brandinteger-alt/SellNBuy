@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Brand Integer | Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#f8f5ef;--gold:#b39a68;--gold-dark:#9e8450;--gold-soft:#d9cfb8;--ink:#26231f;--body:#8f877b;--line:#e2dacb;--shadow:0 8px 24px rgba(126,105,67,.07);--green:#3f8f5a;--red:#b0584f;--blue:#4a6fa5}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:'DM Sans',Arial,sans-serif;font-weight:500;font-size:14px}
+button,input,select,textarea{font:inherit}a{color:inherit}a.btn{text-decoration:none;display:inline-block}
+.serif{font-family:'Playfair Display',serif}
+/* Login */
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-box{background:#fff;padding:32px;border-radius:18px;border:1px solid var(--line);width:min(400px,100%);box-shadow:var(--shadow)}
+.login-box h2{font-family:'Playfair Display',serif;color:var(--gold);margin:0 0 18px;font-size:26px}
+.login-box input{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;margin-bottom:12px;outline:0}
+.err{display:none;color:var(--red);background:#fbefed;border:1px solid #e3c1bb;border-radius:8px;padding:9px;font-size:12px;margin-top:10px}
+/* Header */
+header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line)}
+.nav{max-width:1100px;margin:auto;padding:12px 16px;display:flex;align-items:center;gap:10px}
+.brand{flex:1;font-family:'Playfair Display',serif;font-size:22px;line-height:1}.brand small{display:block;font-size:14px;color:var(--gold);font-style:italic;margin-top:3px}
+.btn{border:1px solid var(--gold);background:linear-gradient(180deg,#fffdf9,#fbf8f1);color:var(--gold-dark);border-radius:8px;padding:9px 14px;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap}
+.btn:disabled{opacity:.5;cursor:wait}
+.btn.solid{background:var(--gold-dark);color:#fff;border-color:var(--gold-dark)}
+.btn.green{background:var(--green);border-color:var(--green);color:#fff}
+.btn.red{background:#fff;border-color:var(--red);color:var(--red)}
+.btn.wa{background:#25D366;border-color:#25D366;color:#fff}
+.btn.sm{padding:6px 10px;font-size:11px}
+main{max-width:1100px;margin:auto;padding:16px 16px 80px}
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;cursor:pointer;box-shadow:var(--shadow);transition:.15s;position:relative}
+.stat:hover{transform:translateY(-2px)}.stat.active{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold-soft)}
+.stat .n{font-family:'Playfair Display',serif;font-size:26px;color:var(--gold);font-weight:600}
+.stat .l{font-size:10px;letter-spacing:1px;color:var(--body);text-transform:uppercase;font-weight:700;margin-top:4px}
+.stat.alert .n{color:var(--red)}
+.stat.earn{background:linear-gradient(180deg,#fffaf0,#f5ecd6);border-color:#dfcfaa}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
+/* Lists */
+.view-head{display:flex;align-items:center;gap:10px;margin:22px 0 12px;flex-wrap:wrap}
+.view-head h2{font-family:'Playfair Display',serif;color:var(--gold);margin:0;font-size:24px;flex:1}
+.search{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;outline:0;margin-bottom:12px}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:20px;padding:6px 12px;font-size:11px;cursor:pointer;color:#6f675c}
+.chip.on{background:var(--gold-dark);color:#fff;border-color:var(--gold-dark)}
+.item{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:8px;cursor:pointer;box-shadow:var(--shadow)}
+.item:hover{border-color:var(--gold-soft)}
+.thumb{width:64px;height:64px;border-radius:10px;background:#f4efe5;object-fit:cover;flex:0 0 64px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#c7bba4}
+.item .info{flex:1;min-width:0}
+.item .t{font-weight:700;color:#3d3830;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .s{font-size:12px;color:var(--body);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .r{text-align:right;flex:0 0 auto}
+.item .p{font-family:'Playfair Display',serif;color:#6d624f;font-weight:600}
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;background:#f0e8d8;color:#8d7549;margin-top:4px;white-space:nowrap}
+.b-Live,.b-Completed{background:#e5f3e9;color:var(--green)}
+.b-Rejected,.b-Cancelled,.b-Cancelled---Refund-Due,.b-Refunded{background:#fbefed;color:var(--red)}
+.b-Paused,.b-Sold-Out{background:#eceae6;color:#6f6a62}
+.b-Shipped,.b-Delivered,.b-Payment-Received,.b-Awaiting-Buyer-Approval{background:#e8eef7;color:var(--blue)}
+.empty{text-align:center;padding:30px;color:var(--body);background:#fff;border:1px dashed var(--line);border-radius:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
+.earn-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:700px){.earn-grid{grid-template-columns:repeat(2,1fr)}}
+.note{font-size:12px;color:var(--body);line-height:1.5}
+/* Drawer (detail) */
+.drawer{display:none;position:fixed;inset:0;z-index:100;background:rgba(40,32,22,.45)}
+.drawer.open{display:flex;justify-content:flex-end}
+.panel{background:var(--cream);width:min(620px,100%);height:100%;overflow-y:auto;box-shadow:-10px 0 40px rgba(0,0,0,.15);display:flex;flex-direction:column}
+.panel-head{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:10px;z-index:2}
+.panel-head h3{flex:1;margin:0;font-family:'Playfair Display',serif;color:var(--gold);font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.x{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:20px;cursor:pointer;flex:0 0 34px}
+.panel-body{padding:16px;flex:1}
+.panel-foot{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap}
+.panel-foot .btn{flex:1 1 auto}
+.gal-main{width:100%;height:300px;background:#fff;border:1px solid var(--line);border-radius:14px;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:zoom-in}
+.gal-main img{max-width:100%;max-height:100%;object-fit:contain}
+.gal-thumbs{display:flex;gap:8px;margin-top:8px;overflow-x:auto}
+.gal-thumbs .gt{position:relative;flex:0 0 60px}
+.gal-thumbs img{width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid transparent;cursor:pointer;display:block}
+.gal-thumbs img.on{border-color:var(--gold)}
+.gt .rm{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:0;background:var(--red);color:#fff;font-size:13px;cursor:pointer;line-height:1}
+.sec{margin-top:16px}.sec-t{font-size:10px;letter-spacing:1.3px;text-transform:uppercase;color:#aaa092;font-weight:700;margin-bottom:8px}
+.kv{display:grid;grid-template-columns:130px 1fr;gap:8px 12px;font-size:13px}
+.kv div:nth-child(odd){color:var(--body)}.kv div:nth-child(even){color:#3d3830;font-weight:600;word-break:break-word}
+.desc{white-space:pre-wrap;font-size:13px;line-height:1.55;color:#4f493f}
+.contact{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.money{display:grid;grid-template-columns:1fr auto;gap:6px;font-size:13px}.money .tot{font-weight:700;border-top:1px solid var(--line);padding-top:6px}
+.steps{display:flex;gap:4px;margin:6px 0 4px}.steps div{flex:1;text-align:center;font-size:9px;color:#aaa092;font-weight:700}
+.steps div::before{content:'';display:block;height:5px;border-radius:3px;background:#e7e0d2;margin-bottom:5px}
+.steps div.done{color:var(--gold-dark)}.steps div.done::before{background:var(--gold)}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.field label{font-size:11px;font-weight:700;color:#786f63}
+.field input,.field select,.field textarea{width:100%;min-width:0;padding:10px;border:1px solid var(--line);border-radius:8px;outline:0;background:#fff}
+.field textarea{min-height:90px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 10px}
+@media(max-width:500px){.kv{grid-template-columns:110px 1fr}}
+.addr{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:13px;line-height:1.5;white-space:pre-wrap}
+/* Lightbox */
+.lightbox{display:none;position:fixed;inset:0;z-index:300;background:rgba(20,17,13,.95)}
+.lightbox.open{display:block}
+.lb-stage{position:absolute;inset:50px 0 30px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.lb-stage img{max-width:100%;max-height:100%;object-fit:contain;cursor:zoom-in}
+.lb-stage.zoomed{overflow:auto;display:block}.lb-stage.zoomed img{max-width:none;max-height:none;width:220%;cursor:zoom-out}
+.lb-close{position:absolute;top:10px;right:12px;width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.15);color:#fff;font-size:24px;cursor:pointer;z-index:2}
+.lb-count{position:absolute;top:18px;left:16px;color:#fff;font-size:12px;font-weight:700}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:28px;cursor:pointer;z-index:2}
+.lb-prev{left:10px}.lb-next{right:10px}
+.toast{pointer-events:none;position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#2f2a23;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;z-index:400;display:none}
+</style>
+</head>
+<body>
+
+<div id="loginView" class="login-wrap">
+  <div class="login-box">
+    <div class="brand" style="margin-bottom:18px">Brand Integer<small>Admin</small></div>
+    <h2>Admin Login</h2>
+    <input id="pwd" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')login()">
+    <button class="btn solid" style="width:100%;padding:12px" onclick="login()">Login</button>
+    <div id="loginErr" class="err"></div>
+  </div>
+</div>
+
+<div id="appView" style="display:none">
+<header><div class="nav">
+  <div class="brand">Brand Integer<small>Admin Dashboard</small></div>
+  <button class="btn sm" onclick="refresh(true)">⟳</button>
+  <button class="btn sm" onclick="logout()">Logout</button>
+</div></header>
+
+<main>
+  <div class="stats" id="stats"></div>
+  <div id="view"></div>
+</main>
+</div>
+
+<div id="drawer" class="drawer" onclick="if(event.target===this)closeDrawer()">
+  <div class="panel">
+    <div class="panel-head"><h3 id="dTitle"></h3><button class="x" onclick="closeDrawer()">×</button></div>
+    <div class="panel-body" id="dBody"></div>
+    <div class="panel-foot" id="dFoot"></div>
+  </div>
+</div>
+
+<div id="lightbox" class="lightbox" onclick="if(event.target===this)closeLb()">
+  <button class="lb-close" onclick="closeLb()">×</button>
+  <div class="lb-count" id="lbCount"></div>
+  <div class="lb-stage" id="lbStage"><img id="lbImg" alt="" onclick="this.parentElement.classList.toggle('zoomed')"></div>
+  <button class="lb-nav lb-prev" onclick="lbGo(-1)">‹</button>
+  <button class="lb-nav lb-next" onclick="lbGo(1)">›</button>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbz72EdExA6rzpSDhI-HG3hFv2rylJaeJb0VpOpweSL_HHMkoiHVs-wuMAI6i-la_46E/exec';
+let pwd = '', listings = [], orders = [], view = 'dashboard', query = '', subFilter = '', editing = false, openItem = null;
+let timer = null;
+
+/* ---------- utils ---------- */
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rupee = n => '₹' + Math.round(Number(n) || 0).toLocaleString('en-IN');
+const phone10 = v => String(v || '').replace(/\D/g, '').slice(-10);
+const fmtDate = d => { if (!d) return '—'; const x = new Date(d); return isNaN(x) ? String(d) : x.toLocaleString('en-IN', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}); };
+const badge = s => `<span class="badge b-${esc(String(s||'').replace(/[^\w]+/g,'-'))}">${esc(s || '—')}</span>`;
+const hiRes = u => String(u).replace(/sz=w\d+/, 'sz=w2000');
+const earn = p => { p = Number(p) || 0; return {seller: p*.04, buyer: p*.04, fee: 5, total: p*.08 + 5, buyerPays: p*1.04 + 5, sellerGets: p*.96}; };
+function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', 2500); }
+const listingById = id => listings.find(l => String(l.id) === String(id));
+const orderById = id => orders.find(o => String(o.id) === String(id));
+const maskPhone = v => { const n = phone10(v); return n.length === 10 ? n.slice(0, 2) + 'XXXXXX' + n.slice(8) : (v ? 'XXXXXXXXXX' : '—'); };
+const waLink = (num, text) => { const n = phone10(num); return n.length === 10 ? `https://wa.me/91${n}${text ? '?text=' + encodeURIComponent(text) : ''}` : ''; };
+
+/* ---------- order status groups ---------- */
+const O_NEW = ['Pending'];
+const O_PROGRESS = ['Payment Received', 'Awaiting Buyer Approval', 'Shipped'];
+const isToRelease = o => o.status === 'Delivered' && o.paymentReleased !== 'Yes';
+const O_CLOSED = ['Completed', 'Cancelled', 'Cancelled - Refund Due', 'Refunded'];
+const STEPS = ['Enquiry', 'Paid', 'Shipped', 'Delivered', 'Released'];
+function stepIndex(o) {
+  if (o.paymentReleased === 'Yes') return 4;
+  if (o.status === 'Delivered') return 3;
+  if (o.status === 'Shipped') return 2;
+  if (o.paymentConfirmed === 'Yes') return 1;
+  return 0;
+}
+
+/* ---------- API ---------- */
+async function api(action, payload = {}) {
+  const r = await fetch(API_URL, {method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'}, body: JSON.stringify({action, password: pwd, ...payload})});
+  const data = JSON.parse(await r.text());
+  if (!data.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+/* ---------- auth ---------- */
+async function login(saved) {
+  pwd = saved || document.getElementById('pwd').value;
+  try {
+    const data = await api('adminData');
+    try { localStorage.setItem('bi_admin_pwd', pwd); } catch (e) {}
+    listings = data.listings || []; orders = data.transactions || [];
+    document.getElementById('loginView').style.display = 'none';
+    document.getElementById('appView').style.display = 'block';
+    try { view = localStorage.getItem('bi_admin_view') || 'dashboard'; } catch (e) {}
+    renderAll();
+    clearInterval(timer); timer = setInterval(() => { if (document.visibilityState === 'visible') refresh(); }, 20000);
+  } catch (err) {
+    pwd = ''; try { localStorage.removeItem('bi_admin_pwd'); } catch (e) {}
+    document.getElementById('loginView').style.display = 'flex';
+    document.getElementById('appView').style.display = 'none';
+    if (!saved) { const e = document.getElementById('loginErr'); e.textContent = '❌ ' + err.message; e.style.display = 'block'; }
+  }
+}
+function logout() {
+  pwd = ''; clearInterval(timer);
+  try { localStorage.removeItem('bi_admin_pwd'); } catch (e) {}
+  document.getElementById('appView').style.display = 'none';
+  document.getElementById('loginView').style.display = 'flex';
+  document.getElementById('pwd').value = '';
+}
+async function refresh(manual) {
+  if (!pwd) return;
+  try {
+    const data = await api('adminData');
+    listings = data.listings || []; orders = data.transactions || [];
+    renderStats(); renderView();
+    if (openItem && !editing) reopen();
+    if (manual) toast('Refreshed');
+  } catch (e) { if (manual) toast('❌ ' + e.message); }
+}
+
+/* ---------- actions ---------- */
+async function act(actionType, id, data = {}, msg) {
+  const btns = document.querySelectorAll('#dFoot .btn, #dBody .btn'); btns.forEach(b => b.disabled = true);
+  try {
+    const res = await api('adminAction', {actionType, id, data});
+    listings = res.listings || listings; orders = res.transactions || orders;
+    editing = false;
+    renderStats(); renderView(); reopen();
+    toast(msg || '✅ ' + res.result);
+  } catch (e) { alert('❌ ' + e.message); btns.forEach(b => b.disabled = false); }
+}
+
+/* ---------- stats ---------- */
+function counts() {
+  const earned = orders.filter(o => o.paymentReleased === 'Yes').reduce((a, o) => a + earn(o.price).total, 0);
+  return {
+    pending: listings.filter(l => l.status === 'Pending Approval').length,
+    live: listings.filter(l => l.status === 'Live').length,
+    inactive: listings.filter(l => ['Paused', 'Sold Out', 'Rejected'].includes(l.status)).length,
+    neworders: orders.filter(o => O_NEW.includes(o.status)).length,
+    progress: orders.filter(o => O_PROGRESS.includes(o.status)).length,
+    release: orders.filter(isToRelease).length,
+    history: orders.filter(o => O_CLOSED.includes(o.status)).length,
+    earnings: earned
+  };
+}
+const CARDS = [
+  ['pending', 'Listings to Review', true], ['live', 'Live Products'], ['inactive', 'Delisted / Sold'], ['neworders', 'New Orders', true],
+  ['progress', 'Orders in Progress'], ['release', 'Payments to Release', true], ['history', 'Order History'], ['earnings', 'BI Earnings']
+];
+function renderStats() {
+  const c = counts();
+  document.getElementById('stats').innerHTML = CARDS.map(([k, label, alertIf]) => {
+    const val = k === 'earnings' ? rupee(c.earnings) : c[k];
+    const cls = ['stat', view === k ? 'active' : '', k === 'earnings' ? 'earn' : '', alertIf && c[k] > 0 ? 'alert' : ''].join(' ');
+    return `<div class="${cls}" onclick="go('${k}')"><div class="n">${val}</div><div class="l">${label}</div></div>`;
+  }).join('');
+}
+
+/* ---------- views ---------- */
+function go(v) {
+  view = view === v ? 'dashboard' : v; query = ''; subFilter = '';
+  try { localStorage.setItem('bi_admin_view', view); } catch (e) {}
+  renderAll();
+  if (view !== 'dashboard') document.getElementById('view').scrollIntoView({behavior: 'smooth'});
+}
+function renderAll() { renderStats(); renderView(); }
+
+function listingItem(l) {
+  const img = (l.images || [])[0];
+  return `<div class="item" onclick="openListing('${esc(l.id)}')">
+    ${img ? `<img class="thumb" src="${esc(img)}" loading="lazy">` : '<div class="thumb">📦</div>'}
+    <div class="info"><div class="t">${esc(l.name)}</div><div class="s">${esc(l.sellerName)} · ${esc(l.location)}</div><div class="s">${fmtDate(l.createdAt)} · Qty ${l.qty}</div></div>
+    <div class="r"><div class="p">${rupee(l.price)}</div>${badge(l.status)}</div></div>`;
+}
+function orderItem(o) {
+  const l = listingById(o.productId); const img = l && (l.images || [])[0];
+  return `<div class="item" onclick="openOrder('${esc(o.id)}')">
+    ${img ? `<img class="thumb" src="${esc(img)}" loading="lazy">` : '<div class="thumb">🛒</div>'}
+    <div class="info"><div class="t">${esc(o.productName)}</div><div class="s">Buyer: ${esc(o.buyerName)} · ${esc(o.city)}</div><div class="s">${fmtDate(o.createdAt)}</div></div>
+    <div class="r"><div class="p">${rupee(o.price)}</div>${badge(o.status)}</div></div>`;
+}
+const matches = (obj, keys) => !query || keys.map(k => obj[k]).join(' ').toLowerCase().includes(query.toLowerCase());
+const L_KEYS = ['name', 'brand', 'sellerName', 'whatsapp', 'location', 'pincode', 'category', 'id'];
+const O_KEYS = ['productName', 'buyerName', 'buyerWhatsApp', 'city', 'sellerName', 'id', 'awb'];
+
+function listView(title, items, render, chips) {
+  const chipHtml = chips ? `<div class="filters">${['', ...chips].map(c => `<button class="chip ${subFilter === c ? 'on' : ''}" onclick="subFilter='${c}';renderView()">${c || 'All'}</button>`).join('')}</div>` : '';
+  return `<div class="view-head"><h2>${title}</h2><button class="btn sm" onclick="go('dashboard')">← Dashboard</button></div>
+    <input class="search" placeholder="Search name, seller, buyer, phone…" value="${esc(query)}" oninput="query=this.value;renderList()">
+    ${chipHtml}<div id="list">${items.length ? items.map(render).join('') : '<div class="empty">Nothing here</div>'}</div>`;
+}
+function renderList() { // re-render only the list, keeping the search box focused
+  const html = document.createElement('div'); html.innerHTML = buildView();
+  const nl = html.querySelector('#list'); const cur = document.getElementById('list');
+  if (nl && cur) cur.innerHTML = nl.innerHTML;
+}
+function buildView() {
+  const byNewest = (a, b) => String(b.createdAt).localeCompare(String(a.createdAt));
+  const L = f => listings.filter(f).filter(l => matches(l, L_KEYS)).sort(byNewest);
+  const O = f => orders.filter(f).filter(o => matches(o, O_KEYS)).sort(byNewest);
+  switch (view) {
+    case 'pending': return listView('Listings to Review', L(l => l.status === 'Pending Approval'), listingItem);
+    case 'live': return listView('Live Products', L(l => l.status === 'Live'), listingItem);
+    case 'inactive': return listView('Delisted / Sold / Rejected', L(l => ['Paused', 'Sold Out', 'Rejected'].includes(l.status) && (!subFilter || l.status === subFilter)), listingItem, ['Paused', 'Sold Out', 'Rejected']);
+    case 'neworders': return listView('New Orders', O(o => O_NEW.includes(o.status)), orderItem);
+    case 'progress': return listView('Orders in Progress', O(o => O_PROGRESS.includes(o.status) && (!subFilter || o.status === subFilter)), orderItem, ['Payment Received', 'Shipped']);
+    case 'release': return listView('Payments to Release', O(isToRelease), orderItem);
+    case 'history': return listView('Order History', O(o => O_CLOSED.includes(o.status) && (!subFilter || o.status === subFilter)), orderItem, ['Completed', 'Cancelled', 'Cancelled - Refund Due', 'Refunded']);
+    case 'earnings': return earningsView();
+    default: return dashboardView();
+  }
+}
+function renderView() { document.getElementById('view').innerHTML = buildView(); }
+
+function dashboardView() {
+  const todo = [
+    ...listings.filter(l => l.status === 'Pending Approval').map(l => ({d: l.createdAt, h: listingItem(l)})),
+    ...orders.filter(o => O_NEW.includes(o.status) || isToRelease(o) || o.status === 'Cancelled - Refund Due').map(o => ({d: o.createdAt, h: orderItem(o)}))
+  ].sort((a, b) => String(b.d).localeCompare(String(a.d)));
+  return `<div class="view-head"><h2>Needs Your Action</h2></div>
+    ${todo.length ? todo.map(x => x.h).join('') : '<div class="empty">🎉 All caught up. Nothing needs action.</div>'}`;
+}
+
+function earningsView() {
+  const done = orders.filter(o => o.paymentReleased === 'Yes');
+  const upcoming = orders.filter(o => o.paymentConfirmed === 'Yes' && o.paymentReleased !== 'Yes' && !O_CLOSED.includes(o.status));
+  const sum = (list, k) => list.reduce((a, o) => a + earn(o.price)[k], 0);
+  const box = (l, v) => `<div class="card" style="margin:0"><div class="l" style="font-size:10px;color:var(--body);font-weight:700;letter-spacing:1px;text-transform:uppercase">${l}</div><div class="serif" style="font-size:24px;color:var(--gold);margin-top:6px">${v}</div></div>`;
+  return `<div class="view-head"><h2>Brand Integer Earnings</h2><button class="btn sm" onclick="go('dashboard')">← Dashboard</button></div>
+    <p class="note">Per completed order: 4% seller commission + 4% buyer commission + ₹5 buyer platform fee. <b>Earned</b> = seller payment released. <b>Upcoming</b> = paid orders not yet released.</p>
+    <div class="earn-grid">${box('Seller Commission', rupee(sum(done, 'seller')))}${box('Buyer Commission', rupee(sum(done, 'buyer')))}${box('Platform Fees', rupee(sum(done, 'fee')))}${box('Total Earned', rupee(sum(done, 'total')))}</div>
+    <div class="card"><b>Upcoming:</b> ${rupee(sum(upcoming, 'total'))} from ${upcoming.length} order(s) &nbsp;·&nbsp; <b>GMV (completed):</b> ${rupee(done.reduce((a, o) => a + o.price, 0))}</div>
+    ${[...done, ...upcoming].map(o => `<div class="item" onclick="openOrder('${esc(o.id)}')"><div class="info"><div class="t">${esc(o.productName)}</div><div class="s">${esc(o.sellerName)} → ${esc(o.buyerName)} · ${rupee(o.price)}</div></div><div class="r"><div class="p">${rupee(earn(o.price).total)}</div><span class="badge">${o.paymentReleased === 'Yes' ? 'Earned' : 'Upcoming'}</span></div></div>`).join('') || '<div class="empty">No earnings yet</div>'}`;
+}
+
+/* ---------- drawer ---------- */
+function openDrawer(title, body, foot) {
+  document.getElementById('dTitle').textContent = title;
+  document.getElementById('dBody').innerHTML = body;
+  document.getElementById('dFoot').innerHTML = foot;
+  document.getElementById('dFoot').style.display = foot ? 'flex' : 'none';
+  document.getElementById('drawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDrawer() {
+  if (editing && !confirm('Discard unsaved changes?')) return;
+  editing = false; openItem = null;
+  document.getElementById('drawer').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function reopen() {
+  if (!openItem) return;
+  const keepScroll = document.querySelector('.panel').scrollTop;
+  if (openItem.type === 'listing') openListing(openItem.id); else openOrder(openItem.id);
+  document.querySelector('.panel').scrollTop = keepScroll;
+}
+
+/* ---------- listing detail ---------- */
+let galIdx = 0, editImages = [];
+function openListing(id, keepGal) {
+  const l = listingById(id);
+  if (!l) { closeDrawer(); toast('Listing no longer exists'); return; }
+  if (!openItem || openItem.id !== id) galIdx = 0;
+  openItem = {type: 'listing', id};
+  if (editing) return openListingEdit(l);
+  const imgs = l.images || [];
+  const lOrders = orders.filter(o => String(o.productId) === String(l.id));
+  const wa = waLink(l.whatsapp, `Hi ${l.sellerName}, this is Brand Integer regarding your listing "${l.name}".`);
+  const body = `
+    ${imgs.length ? `<div class="gal-main" onclick="openLb(listingById('${esc(l.id)}').images, galIdx)"><img id="galMain" src="${esc(imgs[galIdx] || imgs[0])}"></div>
+      <div class="gal-thumbs">${imgs.map((u, k) => `<div class="gt"><img src="${esc(u)}" class="${k === galIdx ? 'on' : ''}" onclick="galIdx=${k};document.getElementById('galMain').src=this.src;document.querySelectorAll('.gal-thumbs img').forEach((x,j)=>x.classList.toggle('on',j===${k}))"></div>`).join('')}</div>
+      <div class="note" style="margin-top:4px">${imgs.length} photo(s) · tap to zoom</div>` : '<div class="empty">⚠️ No photos uploaded</div>'}
+    <div class="sec" style="display:flex;justify-content:space-between;align-items:center"><div class="serif" style="font-size:26px;color:#6d624f">${rupee(l.price)}</div>${badge(l.status)}</div>
+    <div class="sec"><div class="sec-t">Product</div><div class="kv">
+      <div>Name</div><div>${esc(l.name)}</div><div>Brand</div><div>${esc(l.brand) || '—'}</div>
+      <div>Category</div><div>${esc(l.category)}</div><div>Condition</div><div>${esc(l.condition)}</div>
+      <div>Listed price</div><div>${rupee(l.price)}</div><div>Min. acceptable 🔒</div><div>${rupee(l.minPrice)}</div>
+      <div>Quantity</div><div>${l.qty}</div><div>City (public)</div><div>${esc(l.location)}</div>
+    </div></div>
+    <div class="sec"><div class="sec-t">Description</div><div class="desc">${esc(l.description) || '—'}</div></div>
+    <div class="sec"><div class="sec-t">Seller</div><div class="kv">
+      <div>Name</div><div>${esc(l.sellerName)}</div><div>WhatsApp</div><div>${maskPhone(l.whatsapp)}</div><div>Email</div><div>${esc(l.email) || '—'}</div>
+      <div>Pincode</div><div>${esc(l.pincode) || '—'}</div>
+    </div><div class="contact">
+      ${wa ? `<a class="btn sm wa" href="${wa}" target="_blank">WhatsApp seller</a><a class="btn sm" href="tel:+91${phone10(l.whatsapp)}">📞 Call</a>` : ''}
+      ${l.email ? `<a class="btn sm" href="mailto:${esc(l.email)}">✉️ Email</a>` : ''}
+    </div></div>
+    <div class="sec"><div class="sec-t">Admin notes (private)</div>
+      <div class="field"><textarea id="lNotes" placeholder="e.g. Asked seller for box photo">${esc(l.adminNotes)}</textarea></div>
+      <button class="btn sm" onclick="act('updateListing','${esc(l.id)}',{adminNotes:document.getElementById('lNotes').value},'✅ Notes saved')">Save notes</button></div>
+    <div class="sec"><div class="sec-t">Orders for this product (${lOrders.length})</div>${lOrders.map(orderItem).join('') || '<div class="note">No orders yet</div>'}</div>
+    <div class="sec note">ID ${esc(l.id)} · Listed ${fmtDate(l.createdAt)}${l.updatedAt ? ' · Updated ' + fmtDate(l.updatedAt) : ''}</div>`;
+
+  const id_ = esc(l.id);
+  const B = {
+    approve: `<button class="btn green" onclick="act('approveListing','${id_}',{},'✅ Listing is now live')">✓ Approve</button>`,
+    reject: `<button class="btn red" onclick="rejectListing('${id_}')">✗ Reject</button>`,
+    edit: `<button class="btn" onclick="editing=true;openListing('${id_}')">✏️ Edit</button>`,
+    pause: `<button class="btn" onclick="if(confirm('Delist this product? Buyers will no longer see it.'))act('pauseListing','${id_}',{},'Product delisted')">⏸ Delist</button>`,
+    sold: `<button class="btn" onclick="if(confirm('Mark as sold out?'))act('markSoldOut','${id_}')">Sold Out</button>`,
+    relist: `<button class="btn green" onclick="act('relistListing','${id_}',{},'✅ Product is live again')">▶ Relist</button>`,
+    del: `<button class="btn red" onclick="if(confirm('Delete this listing permanently from the dashboard?'))act('deleteListing','${id_}',{},'Listing deleted').then(()=>{editing=false;openItem=null;document.getElementById('drawer').classList.remove('open');document.body.style.overflow='';})">🗑 Delete</button>`
+  };
+  const foot = {
+    'Pending Approval': [B.approve, B.reject, B.edit],
+    'Live': [B.edit, B.pause, B.sold, B.del],
+    'Paused': [B.relist, B.edit, B.del],
+    'Sold Out': [B.relist, B.edit, B.del],
+    'Rejected': [B.approve, B.edit, B.del]
+  }[l.status] || [B.edit, B.del];
+  openDrawer(l.name, body, foot.join(''));
+}
+function rejectListing(id) {
+  const reason = prompt('Reason for rejection (saved in admin notes; you can share it with the seller):');
+  if (reason === null) return;
+  act('rejectListing', id, {reason}, 'Listing rejected');
+}
+function openListingEdit(l) {
+  if (!editImages._for || editImages._for !== l.id) { editImages = [...(l.images || [])]; editImages._for = l.id; }
+  const opt = (arr, v) => arr.map(x => `<option ${x === v ? 'selected' : ''}>${x}</option>`).join('');
+  const body = `
+    <div class="sec-t">Photos (tap × to remove)</div>
+    <div class="gal-thumbs" style="padding-top:6px">${editImages.map((u, k) => `<div class="gt"><img src="${esc(u)}"><button class="rm" onclick="editImages.splice(${k},1);openListing('${esc(l.id)}')">×</button></div>`).join('') || '<div class="note">No photos</div>'}</div>
+    <div class="sec">
+    <div class="field"><label>Product name</label><input id="e_name" value="${esc(l.name)}"></div>
+    <div class="grid2"><div class="field"><label>Brand</label><input id="e_brand" value="${esc(l.brand)}"></div>
+    <div class="field"><label>Category</label><select id="e_category">${opt(['Electronics','Beauty','Home & Kitchen','Fashion','Accessories','Kids Essentials','Other'], l.category)}</select></div></div>
+    <div class="grid2"><div class="field"><label>Condition</label><select id="e_condition">${opt(['New','Like New','Used'], l.condition)}</select></div>
+    <div class="field"><label>Quantity</label><input id="e_qty" type="number" min="0" value="${l.qty}"></div></div>
+    <div class="grid2"><div class="field"><label>Listed price (₹)</label><input id="e_price" type="number" min="0" value="${l.price}"></div>
+    <div class="field"><label>Min. acceptable (₹)</label><input id="e_minPrice" type="number" min="0" value="${l.minPrice}"></div></div>
+    <div class="field"><label>City (shown to buyers)</label><input id="e_location" value="${esc(l.location)}"></div>
+    <div class="field"><label>Seller pincode (shown to buyers)</label><input id="e_pincode" inputmode="numeric" maxlength="6" value="${esc(l.pincode)}"></div>
+    <div class="field"><label>Description</label><textarea id="e_description" style="min-height:130px">${esc(l.description)}</textarea></div>
+    <div class="grid2"><div class="field"><label>Seller name</label><input id="e_sellerName" value="${esc(l.sellerName)}"></div>
+    <div class="field"><label>Seller WhatsApp (${maskPhone(l.whatsapp)})</label><input id="e_whatsapp" type="tel" placeholder="Leave blank to keep"></div></div>
+    <div class="field"><label>Seller email</label><input id="e_email" type="email" value="${esc(l.email)}"></div>
+    </div>`;
+  const foot = `<button class="btn green" onclick="saveListing('${esc(l.id)}')">💾 Save changes</button><button class="btn" onclick="editing=false;editImages=[];openListing('${esc(l.id)}')">Cancel</button>`;
+  openDrawer('Edit: ' + l.name, body, foot);
+}
+function saveListing(id) {
+  const g = k => document.getElementById('e_' + k).value;
+  const data = {images: [...editImages]};
+  ['name','brand','category','condition','qty','price','minPrice','location','pincode','description','sellerName','whatsapp','email'].forEach(k => data[k] = g(k));
+  if (!String(data.whatsapp).trim()) delete data.whatsapp;
+  if (!data.name.trim()) return alert('Name is required');
+  if (Number(data.minPrice) > Number(data.price)) return alert('Minimum price cannot be higher than listed price');
+  editImages = [];
+  act('updateListing', id, data, '✅ Listing updated');
+}
+
+/* ---------- order detail ---------- */
+function openOrder(id) {
+  const o = orderById(id);
+  if (!o) { closeDrawer(); toast('Order no longer exists'); return; }
+  openItem = {type: 'order', id};
+  const l = listingById(o.productId); const img = l && (l.images || [])[0];
+  const e = earn(o.price); const st = stepIndex(o); const closed = O_CLOSED.includes(o.status);
+  const updateMsg = `Hi ${o.buyerName}, update from Brand Integer on your order "${o.productName}": ${o.status}${o.awb ? '. Tracking (Delhivery AWB): ' + o.awb : ''}.`;
+  const addr = `${o.buyerName}\n${o.address}\n${o.city} - ${o.pincode}`;
+  const body = `
+    <div class="item" style="cursor:${l ? 'pointer' : 'default'}" ${l ? `onclick="openListing('${esc(l.id)}')"` : ''}>
+      ${img ? `<img class="thumb" src="${esc(img)}">` : '<div class="thumb">🛒</div>'}
+      <div class="info"><div class="t">${esc(o.productName)}</div><div class="s">${l ? 'Tap to view listing · Stock left: ' + l.qty : 'Listing removed'}</div></div>
+      <div class="r">${badge(o.status)}</div></div>
+    ${closed ? '' : `<div class="steps">${STEPS.map((s, k) => `<div class="${k <= st ? 'done' : ''}">${s}</div>`).join('')}</div>`}
+    <div class="sec"><div class="sec-t">Money</div><div class="card" style="margin:0"><div class="money">
+      <div>Agreed product price</div><div><b>${rupee(o.price)}</b></div>
+      <div>Buyer pays (+4% + ₹5, excl. courier)</div><div>${rupee(e.buyerPays)}</div>
+      <div>Seller receives (−4%)</div><div>${rupee(e.sellerGets)}</div>
+      <div class="tot">Brand Integer earns</div><div class="tot">${rupee(e.total)}</div>
+    </div></div></div>
+    <div class="sec"><div class="sec-t">Buyer</div><div class="kv">
+      <div>Name</div><div>${esc(o.buyerName)}</div><div>WhatsApp</div><div>${maskPhone(o.buyerWhatsApp)}</div><div>Email</div><div>${esc(o.buyerEmail) || '—'}</div>
+    </div>
+    <div class="contact">
+      ${waLink(o.buyerWhatsApp) ? `<a class="btn sm wa" href="${waLink(o.buyerWhatsApp, `Hi ${o.buyerName}, this is Brand Integer regarding your order "${o.productName}".`)}" target="_blank">WhatsApp buyer</a>
+      <a class="btn sm wa" href="${waLink(o.buyerWhatsApp, updateMsg)}" target="_blank">Send status update</a>
+      <a class="btn sm" href="tel:+91${phone10(o.buyerWhatsApp)}">📞 Call</a>` : ''}
+    </div></div>
+    <div class="sec"><div class="sec-t">Seller</div><div class="kv"><div>Name</div><div>${esc(o.sellerName)}</div>${l ? `<div>WhatsApp</div><div>${maskPhone(l.whatsapp)}</div><div>City</div><div>${esc(l.location)}</div><div>Pincode</div><div>${esc(l.pincode) || '—'}</div>` : ''}</div>
+    ${l && waLink(l.whatsapp) ? `<div class="contact"><a class="btn sm wa" href="${waLink(l.whatsapp, `Hi ${l.sellerName}, Brand Integer here. Your product "${o.productName}" has an order. Please ship to:\n\n${addr}`)}" target="_blank">Send order details to seller</a><a class="btn sm" href="tel:+91${phone10(l.whatsapp)}">📞 Call</a></div>` : ''}</div>
+    <div class="sec"><div class="sec-t">Edit order</div>
+      <div class="grid2"><div class="field"><label>Agreed price (₹)</label><input id="o_price" type="number" min="0" value="${o.price}"></div>
+      <div class="field"><label>Delhivery AWB / tracking</label><input id="o_awb" value="${esc(o.awb)}"></div></div>
+      <div class="field"><label>Notes (private)</label><textarea id="o_notes">${esc(o.notes)}</textarea></div>
+      <button class="btn sm" onclick="act('updateOrder','${esc(o.id)}',{price:document.getElementById('o_price').value,awb:document.getElementById('o_awb').value,notes:document.getElementById('o_notes').value},'✅ Order saved')">💾 Save</button>
+      <div class="note" style="margin-top:6px">Update the price here if you agreed a different price with the buyer — earnings use this price.</div></div>
+    <div class="sec note">Order ${esc(o.id)} · Placed ${fmtDate(o.createdAt)}${o.updatedAt ? ' · Updated ' + fmtDate(o.updatedAt) : ''}</div>`;
+
+  const id_ = esc(o.id);
+  const cancel = `<button class="btn red" onclick="cancelOrder('${id_}')">Cancel order</button>`;
+  let foot = '';
+  if (o.status === 'Pending') foot = `<button class="btn green" onclick="if(confirm('Confirm you have received ${rupee(e.buyerPays)} from the buyer? Stock will reduce by 1.'))act('confirmPayment','${id_}',{},'✅ Payment confirmed')">✓ Payment Received</button>${cancel}`;
+  else if (o.status === 'Payment Received' || o.status === 'Awaiting Buyer Approval') foot = `<button class="btn green" onclick="markShipped('${id_}')">🚚 Mark Shipped</button>${cancel}`;
+  else if (o.status === 'Shipped') foot = `<button class="btn green" onclick="if(confirm('Buyer has received the product?'))act('markDelivered','${id_}',{},'✅ Marked delivered')">📦 Mark Delivered</button>${cancel}`;
+  else if (isToRelease(o)) foot = `<button class="btn green" onclick="if(confirm('Release ${rupee(e.sellerGets)} to ${esc(String(o.sellerName||'seller').replace(/[\'"\\]/g,''))}? Do this only after buyer approval.'))act('releasePayment','${id_}',{},'✅ Payment released')">💸 Release ${rupee(e.sellerGets)} to Seller</button>`;
+  else if (o.status === 'Cancelled - Refund Due') foot = `<button class="btn green" onclick="if(confirm('Mark refund as done?'))act('markRefunded','${id_}',{},'✅ Marked refunded')">✓ Refund Done</button>`;
+  openDrawer('Order · ' + o.productName, body, foot);
+}
+function markShipped(id) {
+  const cur = document.getElementById('o_awb').value;
+  const awb = prompt('Delhivery AWB / tracking number (optional):', cur);
+  if (awb === null) return;
+  act('markShipped', id, {awb}, '✅ Marked shipped');
+}
+function cancelOrder(id) {
+  const o = orderById(id);
+  const reason = prompt(`Cancel this order?${o.paymentConfirmed === 'Yes' ? '\n\nPayment was received — it will be marked "Refund Due" and stock will be restored.' : ''}\n\nReason:`);
+  if (reason === null) return;
+  act('cancelOrder', id, {reason}, 'Order cancelled');
+}
+
+/* ---------- lightbox ---------- */
+let lbImgs = [], lbI = 0, lbX = null;
+function openLb(imgs, i) { lbImgs = imgs || []; if (!lbImgs.length) return; lbI = i || 0; showLb(); document.getElementById('lightbox').classList.add('open'); }
+function showLb() {
+  document.getElementById('lbStage').classList.remove('zoomed');
+  document.getElementById('lbImg').src = hiRes(lbImgs[lbI]);
+  document.getElementById('lbCount').textContent = (lbI + 1) + ' / ' + lbImgs.length;
+  document.querySelectorAll('.lb-nav').forEach(b => b.style.display = lbImgs.length > 1 ? 'block' : 'none');
+}
+function lbGo(d) { lbI = (lbI + d + lbImgs.length) % lbImgs.length; showLb(); }
+function closeLb() { document.getElementById('lightbox').classList.remove('open'); }
+document.addEventListener('touchstart', e => { if (e.target.closest('#lightbox') && !document.getElementById('lbStage').classList.contains('zoomed')) lbX = e.touches[0].clientX; }, {passive: true});
+document.addEventListener('touchend', e => { if (lbX === null) return; const dx = e.changedTouches[0].clientX - lbX; lbX = null; if (Math.abs(dx) > 50 && lbImgs.length > 1) lbGo(dx < 0 ? 1 : -1); }, {passive: true});
+document.addEventListener('keydown', e => {
+  if (document.getElementById('lightbox').classList.contains('open')) { if (e.key === 'Escape') closeLb(); if (e.key === 'ArrowRight') lbGo(1); if (e.key === 'ArrowLeft') lbGo(-1); }
+  else if (e.key === 'Escape' && document.getElementById('drawer').classList.contains('open')) closeDrawer();
+});
+
+/* ---------- start ---------- */
+(function () {
+  let saved = null; try { saved = localStorage.getItem('bi_admin_pwd'); } catch (e) {}
+  if (saved) { document.getElementById('loginView').style.display = 'none'; login(saved); }
+  else document.getElementById('pwd').focus();
+})();
+</script>
+</body>
+</html>
